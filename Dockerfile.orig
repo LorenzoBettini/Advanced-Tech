@@ -1,0 +1,11 @@
+<<<<<<< HEAD
+FROM openjdk:8
+EXPOSE 8080
+ADD target/book-management.jar book-management.jar
+ENTRYPOINT ["java", "-jar", "/book-management.jar"]
+=======
+FROM openjdk:11
+EXPOSE 8080
+ADD target/book-management.jar att-project.jar
+ENTRYPOINT ["java", "-jar", "/att-project.jar"]
+>>>>>>> 2bfb682a923a5e5c61828b78850866ffd71d627c
