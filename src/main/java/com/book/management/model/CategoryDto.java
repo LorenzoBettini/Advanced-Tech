@@ -1,6 +1,7 @@
 package com.book.management.model;
 
 import java.util.List;
+import java.util.Objects;
 
 public class CategoryDto {
 	   private Integer id;
@@ -40,5 +41,14 @@ public class CategoryDto {
 
 	    public void setBooks(List<BookDto> books) {
 	        this.books = books;
+	    }
+	    
+	    @Override
+	    public boolean equals(Object o) {
+	        if (this == o) return true;
+	        if (o == null || getClass() != o.getClass()) return false;
+	        CategoryDto that = (CategoryDto) o;
+	        return Objects.equals(id, that.id) &&
+	               Objects.equals(name, that.name);
 	    }
 }
