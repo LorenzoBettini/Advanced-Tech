@@ -15,6 +15,18 @@ public class BookDto {
 	@NotNull
 	private Integer price;
 
+	private CategoryDto category; // Added category field
+
+    // Getters and setters for all fields
+
+    public CategoryDto getCategory() {
+        return category;
+    }
+
+    public void setCategory(CategoryDto category) {
+        this.category = category;
+    }
+
 	public Integer getId() {
 		return id;
 	}
@@ -58,6 +70,6 @@ public class BookDto {
 	public BookDto() {
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	
 }

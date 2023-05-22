@@ -2,14 +2,16 @@ package com.book.management.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "BOOKS")
-
 public class BookEntity {
 
 	@Id
@@ -25,6 +27,27 @@ public class BookEntity {
 
 	@Column(name = "PRICE")
 	private Integer price;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "CATEGORY_ID")
+	private CategoryEntity category;
+
+	// Constructors, getters, and setters
+
+	public BookEntity() {
+	}
+
+	public BookEntity(Integer id, String name, String author, Integer price, CategoryEntity category) {
+		this.id = id;
+		this.name = name;
+		this.author = author;
+		this.price = price;
+		this.category = category;
+	}
+
+	// Other methods
+
+	// Getters and Setters
 
 	public Integer getId() {
 		return id;
@@ -58,17 +81,15 @@ public class BookEntity {
 		this.price = price;
 	}
 
-	public BookEntity(Integer id, String name, String author, Integer price) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.author = author;
-		this.price = price;
+	public CategoryEntity getCategory() {
+		return category;
 	}
 
-	public BookEntity() {
-		// TODO Auto-generated constructor stub
+	public void setCategory(CategoryEntity category) {
+		this.category = category;
 	}
+
+	// Equals and HashCode
 
 	@Override
 	public int hashCode() {
@@ -112,7 +133,4 @@ public class BookEntity {
 			return false;
 		return true;
 	}
-
-
-
 }
