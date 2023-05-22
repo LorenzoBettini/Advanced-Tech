@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.book.management.entity.BookEntity;
+import com.book.management.entity.CategoryEntity;
 import com.book.management.mapper.BeanMapper;
 import com.book.management.model.BookDto;
 import com.book.management.repository.BookRepository;
+import com.book.management.repository.CategoryRepository;
 
 @Service
 public class BookService {
@@ -18,11 +20,12 @@ public class BookService {
 	@Autowired
 	private BookRepository bookRepository;
 
+	@Autowired
+	private CategoryRepository categoryRepository;
+
 	public List<BookDto> getBooks() {
-	    List<BookEntity> books = bookRepository.findAll();
-	    return books.stream()
-	                .map(BeanMapper::mapToDto)
-	                .collect(Collectors.toList());
+		List<BookEntity> books = bookRepository.findAll();
+		return books.stream().map(BeanMapper::mapToDto).collect(Collectors.toList());
 	}
 
 	public BookDto getBook(Integer id) {
@@ -50,4 +53,14 @@ public class BookService {
 		}
 		bookRepository.deleteById(id);
 	}
+
+    public List<BookDto> getBooksByCategory(Integer categoryId) {
+        CategoryEntity category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new NoSuchElementException("There is no Category Found with ID " + categoryId));
+        List<BookEntity> books = bookRepository.findByCategory(category);
+        return books.stream()
+                .map(BeanMapper::mapToDto)
+                .collect(Collectors.toList());
+    }
+
 }

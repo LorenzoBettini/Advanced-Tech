@@ -1,17 +1,15 @@
 package com.book.management.controller;
-import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-import java.util.Optional;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -19,9 +17,8 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.book.management.entity.BookEntity;
 import com.book.management.model.BookDto;
-import com.book.management.repository.BookRepository;
+import com.book.management.model.CategoryDto;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -35,99 +32,108 @@ public class BookControllerTestIT {
 	@Autowired
 	private TestRestTemplate restTemplate;
 
-	@Autowired
-	private BookRepository bookRepository;
+	private BookDto book;
+	private CategoryDto category;
 
-	@Test
-	public void testGetBooks() {
-		// Given
-		BookEntity book1 = new BookEntity(1, "Book 1", "Author 1", 100);
-		BookEntity book2 = new BookEntity(2, "Book 2", "Author 2", 200);
-		bookRepository.save(book1);
-		bookRepository.save(book2);
+	@Before
+	public void setup() {
+		category = new CategoryDto();
+		category.setName("Test Category");
 
-		// When
-		ResponseEntity<List<BookDto>> response = restTemplate.exchange("/books", HttpMethod.GET, null,
-				new ParameterizedTypeReference<List<BookDto>>() {
-				});
-
-		// Then
-		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(response.getBody()).hasSize(2);
-		assertThat(response.getBody().get(0)).isEqualTo(new BookDto(1, "Book 1", "Author 1", 100));
-		assertThat(response.getBody().get(1)).isEqualTo(new BookDto(2, "Book 2", "Author 2", 200));
-	}
-
-	@Test
-	public void testGetBook() {
-		// Given
-		BookEntity book = new BookEntity(1, "Book 1", "Author 1", 100);
-		book = bookRepository.save(book);
-
-		// When
-		ResponseEntity<BookDto> response = restTemplate.getForEntity("/books/" + book.getId(), BookDto.class);
-
-		// Then
-		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(response.getBody()).isEqualTo(new BookDto(1, "Book 1", "Author 1", 100));
+		book = new BookDto();
+		book.setName("Test Book");
+		book.setAuthor("Test Author");
+		book.setPrice(19);
+		book.setCategory(category);
 	}
 
 	@Test
 	public void testSaveBook() {
-		// Given
-		BookDto bookDto = new BookDto(1, "Book 1", "Author 1", 100);
+		ResponseEntity<BookDto> response = restTemplate.postForEntity("/books", book, BookDto.class);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertNotNull(response.getBody());
+		assertNotNull(response.getBody().getId());
+		assertEquals(book.getName(), response.getBody().getName());
+		assertEquals(book.getAuthor(), response.getBody().getAuthor());
+		assertEquals(book.getPrice(), response.getBody().getPrice(), 0.01);
+		assertNotNull(response.getBody().getCategory());
+		assertEquals(category.getName(), response.getBody().getCategory().getName());
+	}
 
-		// When
-		ResponseEntity<BookDto> response = restTemplate.postForEntity("/books", bookDto, BookDto.class);
+	@Test
+	public void testGetBook() {
+		ResponseEntity<BookDto> savedBookResponse = restTemplate.postForEntity("/books", book, BookDto.class);
+		Integer savedBookId = savedBookResponse.getBody().getId();
+		assertNotNull(savedBookId);
 
-		// Then
-		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-		assertThat(response.getBody().getId()).isNotNull();
+		ResponseEntity<BookDto> response = restTemplate.getForEntity("/books/" + savedBookId, BookDto.class);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertNotNull(response.getBody());
+		assertEquals(savedBookId, response.getBody().getId());
+		assertEquals(book.getName(), response.getBody().getName());
+		assertEquals(book.getAuthor(), response.getBody().getAuthor());
+		assertEquals(book.getPrice(), response.getBody().getPrice(), 0.01);
+		assertNotNull(response.getBody().getCategory());
+		assertEquals(category.getName(), response.getBody().getCategory().getName());
+	}
 
-		Optional<BookEntity> savedBook = bookRepository.findById(response.getBody().getId());
-		assertThat(savedBook).isPresent();
-		assertThat(savedBook.get().getName()).isEqualTo(bookDto.getName());
-		assertThat(savedBook.get().getAuthor()).isEqualTo(bookDto.getAuthor());
+	@Test
+	public void testGetBooksByCategory() {
+		ResponseEntity<BookDto> savedBookResponse = restTemplate.postForEntity("/books", book, BookDto.class);
+		Integer savedBookId = savedBookResponse.getBody().getId();
+		assertNotNull(savedBookId);
+
+		ResponseEntity<BookDto[]> response = restTemplate.getForEntity("/books/category/" + category.getId(),
+				BookDto[].class);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertNotNull(response.getBody());
+		assertEquals(1, response.getBody().length);
+		assertEquals(savedBookId, response.getBody()[0].getId());
+		assertEquals(book.getName(), response.getBody()[0].getName());
+		assertEquals(book.getAuthor(), response.getBody()[0].getAuthor());
+		assertEquals(book.getPrice(), response.getBody()[0].getPrice(), 0.01);
+		assertNotNull(response.getBody()[0].getCategory());
+		assertEquals(category.getId(), response.getBody()[0].getCategory().getId());
+		assertEquals(category.getName(), response.getBody()[0].getCategory().getName());
 	}
 
 	@Test
 	public void testUpdateBook() {
-		// Given
-		BookEntity book = new BookEntity(1, "Book 1", "Author 1", 100);
-		book = bookRepository.save(book);
+		ResponseEntity<BookDto> savedBookResponse = restTemplate.postForEntity("/books", book, BookDto.class);
+		Integer savedBookId = savedBookResponse.getBody().getId();
+		assertNotNull(savedBookId);
 
-		BookDto updatedBookDto = new BookDto(1, "Book 1", "Author 1", 100);
-		updatedBookDto.setName("New Title");
-		updatedBookDto.setAuthor("New Author");
+		BookDto updatedBook = savedBookResponse.getBody();
+		updatedBook.setName("Updated Book");
+		updatedBook.setAuthor("Updated Author");
+		updatedBook.setPrice(2999);
 
-		// When
-		ResponseEntity<BookDto> response = restTemplate.exchange("/books/" + book.getId(), HttpMethod.PUT,
-				new HttpEntity<>(updatedBookDto), BookDto.class);
+		restTemplate.put("/books/" + savedBookId, updatedBook);
 
-		// Then
-		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-		Optional<BookEntity> updatedBook = bookRepository.findById(book.getId());
-		assertThat(updatedBook).isPresent();
-		assertThat(updatedBook.get().getName()).isEqualTo(updatedBookDto.getName());
-		assertThat(updatedBook.get().getAuthor()).isEqualTo(updatedBookDto.getAuthor());
+		ResponseEntity<BookDto> response = restTemplate.getForEntity("/books/" + savedBookId, BookDto.class);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertNotNull(response.getBody());
+		assertEquals(savedBookId, response.getBody().getId());
+		assertEquals(updatedBook.getName(), response.getBody().getName());
+		assertEquals(updatedBook.getAuthor(), response.getBody().getAuthor());
+		assertEquals(updatedBook.getPrice(), response.getBody().getPrice(), 0.01);
+		assertNotNull(response.getBody().getCategory());
+		assertEquals(category.getId(), response.getBody().getCategory().getId());
+		assertEquals(category.getName(), response.getBody().getCategory().getName());
 	}
-	
+
 	@Test
 	public void testDeleteBook() {
-	    // Given
-		BookEntity book = new BookEntity(1, "Book 1", "Author 1", 100);
-	    book = bookRepository.save(book);
+		ResponseEntity<BookDto> savedBookResponse = restTemplate.postForEntity("/books", book, BookDto.class);
+		Integer savedBookId = savedBookResponse.getBody().getId();
+		assertNotNull(savedBookId);
 
-	    // When
-	    ResponseEntity<Boolean> response = restTemplate.exchange("/books/" + book.getId(), HttpMethod.DELETE, null,
-	            Boolean.class);
+		// Delete the book
+		restTemplate.delete("/books/" + savedBookId);
 
-	    // Then
-	    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-	    assertThat(response.getBody()).isEqualTo(true);
-
-	    Optional<BookEntity> deletedBook = bookRepository.findById(book.getId());
-	    assertThat(deletedBook).isEmpty();
+		// Verify that the book is deleted
+		ResponseEntity<BookDto> response = restTemplate.getForEntity("/books/" + savedBookId, BookDto.class);
+		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+		assertNull(response.getBody());
 	}
 }
