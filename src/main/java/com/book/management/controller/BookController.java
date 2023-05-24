@@ -1,10 +1,6 @@
 package com.book.management.controller;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,48 +10,59 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.book.management.model.BookDto;
+import com.book.management.entity.Book;
+import com.book.management.entity.Category;
+import com.book.management.mapper.BookConverter;
+import com.book.management.mapper.CategoryConverter;
+import com.book.management.model.BookDTO;
+import com.book.management.model.CategoryDTO;
 import com.book.management.service.BookService;
 
 @RestController
 @RequestMapping("/books")
 public class BookController {
+	private final BookService bookService;
 
-	@Autowired
-	private BookService bookService;
-
-	@GetMapping
-	public List<BookDto> getBooks() {
-		return bookService.getBooks();
-	}
-
-	@GetMapping("/category/{categoryId}")
-	public List<BookDto> getBooksByCategory(@PathVariable("categoryId") Integer categoryId) {
-		return bookService.getBooksByCategory(categoryId);
-	}
-
-	@GetMapping("/{id}")
-	public BookDto getBook(@PathVariable("id") Integer id) {
-		return bookService.getBook(id);
+	public BookController(BookService bookService) {
+		this.bookService = bookService;
 	}
 
 	@PostMapping
-	public BookDto saveBook(@RequestBody @Valid BookDto book) {
-		return bookService.saveBook(book);
+	public ResponseEntity<BookDTO> saveBook(@RequestBody BookDTO bookDTO) {
+		Book book = BookConverter.toEntity(bookDTO);
+		Book savedBook = bookService.save(book);
+		BookDTO savedBookDTO = BookConverter.toDTO(savedBook);
+		return ResponseEntity.ok(savedBookDTO);
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<BookDTO> getBookById(@PathVariable Integer id) {
+		Book book = bookService.findById(id);
+		BookDTO bookDTO = BookConverter.toDTO(book);
+		return ResponseEntity.ok(bookDTO);
 	}
 
 	@PutMapping("/{id}")
-	public BookDto updateBook(@PathVariable("id") Integer id, @RequestBody @Valid BookDto book) {
-		if (!id.equals(book.getId())) {
-			throw new IllegalArgumentException(
-					String.format("Id for url (%d) and dto (%d) must be the same", id, book.getId()));
+	public ResponseEntity<BookDTO> updateBook(@PathVariable Integer id, @RequestBody BookDTO bookDTO) {
+		Book existingBook = bookService.findById(id);
+		existingBook.setName(bookDTO.getName());
+		existingBook.setAuthor(bookDTO.getAuthor());
+		existingBook.setPrice(bookDTO.getPrice());
+
+		CategoryDTO categoryDTO = bookDTO.getCategory();
+		if (categoryDTO != null) {
+			Category category = CategoryConverter.toEntity(categoryDTO);
+			existingBook.setCategory(category);
 		}
-		return bookService.updateBook(id, book);
+
+		Book updatedBook = bookService.save(existingBook);
+		BookDTO updatedBookDTO = BookConverter.toDTO(updatedBook);
+		return ResponseEntity.ok(updatedBookDTO);
 	}
 
 	@DeleteMapping("/{id}")
-	public Boolean deleteBook(@PathVariable("id") Integer id) {
-		bookService.deleteBook(id);
-		return true;
+	public ResponseEntity<Void> deleteBook(@PathVariable Integer id) {
+		bookService.deleteById(id);
+		return ResponseEntity.noContent().build();
 	}
 }

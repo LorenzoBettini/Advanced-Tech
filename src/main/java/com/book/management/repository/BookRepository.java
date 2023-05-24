@@ -1,13 +1,10 @@
 package com.book.management.repository;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import com.book.management.entity.BookEntity;
-import com.book.management.entity.CategoryEntity;
+import com.book.management.entity.Book;
 
-public interface BookRepository extends JpaRepository<BookEntity, Integer> {
-
-	List<BookEntity> findByCategory(CategoryEntity category);
+@Repository
+public interface BookRepository extends JpaRepository<Book, Integer> {
 }

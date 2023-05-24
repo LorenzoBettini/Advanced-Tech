@@ -3,7 +3,7 @@ package com.book.management.model;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-public class BookDto {
+public class BookDTO {
 	private Integer id;
 
 	@NotBlank
@@ -15,17 +15,15 @@ public class BookDto {
 	@NotNull
 	private Integer price;
 
-	private CategoryDto category; // Added category field
+	private CategoryDTO category; 
 
-    // Getters and setters for all fields
+	public CategoryDTO getCategory() {
+		return category;
+	}
 
-    public CategoryDto getCategory() {
-        return category;
-    }
-
-    public void setCategory(CategoryDto category) {
-        this.category = category;
-    }
+	public void setCategory(CategoryDTO category) {
+		this.category = category;
+	}
 
 	public Integer getId() {
 		return id;
@@ -59,7 +57,7 @@ public class BookDto {
 		this.price = price;
 	}
 
-	public BookDto(Integer id, @NotBlank String name, @NotBlank String author, @NotNull Integer price) {
+	public BookDTO(Integer id, @NotBlank String name, @NotBlank String author, @NotNull Integer price) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -67,9 +65,8 @@ public class BookDto {
 		this.price = price;
 	}
 
-	public BookDto() {
+	public BookDTO() {
 		// TODO Auto-generated constructor stub
 	}
 
-	
 }
