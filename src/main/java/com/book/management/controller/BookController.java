@@ -24,10 +24,15 @@ public class BookController {
 	@Autowired
 	private BookService bookService;
 
-    @GetMapping
-    public List<BookDto> getBooks() {
-        return bookService.getBooks();
-    }
+	@GetMapping
+	public List<BookDto> getBooks() {
+		return bookService.getBooks();
+	}
+
+	@GetMapping("/category/{categoryId}")
+	public List<BookDto> getBooksByCategory(@PathVariable("categoryId") Integer categoryId) {
+		return bookService.getBooksByCategory(categoryId);
+	}
 
 	@GetMapping("/{id}")
 	public BookDto getBook(@PathVariable("id") Integer id) {

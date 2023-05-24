@@ -9,6 +9,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.junit.Before;
@@ -20,7 +22,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import com.book.management.model.BookDto;
 import com.book.management.service.BookService;
-
+import static org.mockito.ArgumentMatchers.anyInt;
 @RunWith(MockitoJUnitRunner.class)
 public class BookControllerTest {
     @InjectMocks
@@ -49,6 +51,14 @@ public class BookControllerTest {
         assertEquals(book, result);
     }
 
+    @Test
+    public void testGetBooksByCategory() {
+        List<BookDto> books = Arrays.asList(new BookDto(), new BookDto());
+        when(service.getBooksByCategory(anyInt())).thenReturn(books);
+        List<BookDto> result = controller.getBooksByCategory(1);
+        verify(service).getBooksByCategory(anyInt());
+        assertEquals(books, result);
+    }
     @Test
     public void testGetBookNotFound() {
         when(service.getBook(any())).thenThrow(exception);

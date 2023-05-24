@@ -10,7 +10,10 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MySQLContainer;
@@ -49,17 +52,21 @@ public class BookControllerTestIT {
 
 	@Test
 	public void testSaveBook() {
-		ResponseEntity<BookDto> response = restTemplate.postForEntity("/books", book, BookDto.class);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		HttpEntity<BookDto> request = new HttpEntity<>(book, headers);
+
+		ResponseEntity<BookDto> response = restTemplate.postForEntity("/books", request, BookDto.class);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());
 		assertNotNull(response.getBody().getId());
 		assertEquals(book.getName(), response.getBody().getName());
 		assertEquals(book.getAuthor(), response.getBody().getAuthor());
-		assertEquals(book.getPrice(), response.getBody().getPrice(), 0.01);
+		assertEquals(book.getPrice(), response.getBody().getPrice());
 		assertNotNull(response.getBody().getCategory());
 		assertEquals(category.getName(), response.getBody().getCategory().getName());
 	}
-
 	@Test
 	public void testGetBook() {
 		ResponseEntity<BookDto> savedBookResponse = restTemplate.postForEntity("/books", book, BookDto.class);
@@ -72,7 +79,7 @@ public class BookControllerTestIT {
 		assertEquals(savedBookId, response.getBody().getId());
 		assertEquals(book.getName(), response.getBody().getName());
 		assertEquals(book.getAuthor(), response.getBody().getAuthor());
-		assertEquals(book.getPrice(), response.getBody().getPrice(), 0.01);
+		assertEquals(book.getPrice(), response.getBody().getPrice());
 		assertNotNull(response.getBody().getCategory());
 		assertEquals(category.getName(), response.getBody().getCategory().getName());
 	}
@@ -91,7 +98,7 @@ public class BookControllerTestIT {
 		assertEquals(savedBookId, response.getBody()[0].getId());
 		assertEquals(book.getName(), response.getBody()[0].getName());
 		assertEquals(book.getAuthor(), response.getBody()[0].getAuthor());
-		assertEquals(book.getPrice(), response.getBody()[0].getPrice(), 0.01);
+		assertEquals(book.getPrice(), response.getBody()[0].getPrice());
 		assertNotNull(response.getBody()[0].getCategory());
 		assertEquals(category.getId(), response.getBody()[0].getCategory().getId());
 		assertEquals(category.getName(), response.getBody()[0].getCategory().getName());
@@ -116,7 +123,7 @@ public class BookControllerTestIT {
 		assertEquals(savedBookId, response.getBody().getId());
 		assertEquals(updatedBook.getName(), response.getBody().getName());
 		assertEquals(updatedBook.getAuthor(), response.getBody().getAuthor());
-		assertEquals(updatedBook.getPrice(), response.getBody().getPrice(), 0.01);
+		assertEquals(updatedBook.getPrice(), response.getBody().getPrice());
 		assertNotNull(response.getBody().getCategory());
 		assertEquals(category.getId(), response.getBody().getCategory().getId());
 		assertEquals(category.getName(), response.getBody().getCategory().getName());
