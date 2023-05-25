@@ -1,120 +1,105 @@
 package com.book.management.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import com.book.management.model.BookDto;
+import com.book.management.entity.Book;
+import com.book.management.model.BookDTO;
 import com.book.management.service.BookService;
-import static org.mockito.ArgumentMatchers.anyInt;
-@RunWith(MockitoJUnitRunner.class)
+
+@ExtendWith(MockitoExtension.class)
 public class BookControllerTest {
-    @InjectMocks
-    private BookController controller;
-
     @Mock
-    private BookService service;
+    private BookService bookService;
 
-    private BookDto book;
-    private Integer id;
-    private NoSuchElementException exception;
+    @InjectMocks
+    private BookController bookController;
 
-    @Before
-    public void beforeClass() {
-        id = 1;
-        book = new BookDto();
-        exception = new NoSuchElementException("test exception");
-    }
+    private BookDTO bookDTO;
+    private Book book;
 
+    @BeforeEach
+    public void setup() {
+        // Initialize test data
+        bookDTO = new BookDTO();
+        bookDTO.setName("Sample Book");
+        bookDTO.setAuthor("John Doe");
+        bookDTO.setPrice(9);
 
-    @Test
-    public void testGetBook() {
-        when(service.getBook(any())).thenReturn(book);
-        BookDto result = controller.getBook(id);
-        verify(service).getBook(any());
-        assertEquals(book, result);
-    }
-
-    @Test
-    public void testGetBooksByCategory() {
-        List<BookDto> books = Arrays.asList(new BookDto(), new BookDto());
-        when(service.getBooksByCategory(anyInt())).thenReturn(books);
-        List<BookDto> result = controller.getBooksByCategory(1);
-        verify(service).getBooksByCategory(anyInt());
-        assertEquals(books, result);
-    }
-    @Test
-    public void testGetBookNotFound() {
-        when(service.getBook(any())).thenThrow(exception);
-        NoSuchElementException result = assertThrows(NoSuchElementException.class, () -> controller.getBook(1));
-        verify(service).getBook(any());
-        assertEquals(exception.getMessage(), result.getMessage());
+        book = new Book();
+        book.setId(1);
+        book.setName("Sample Book");
+        book.setAuthor("John Doe");
+        book.setPrice(9);
     }
 
     @Test
-    public void testSaveBook() {
-        when(service.saveBook(any())).thenReturn(book);
-        BookDto result = controller.saveBook(book);
-        verify(service).saveBook(any());
-        assertEquals(book, result);
+    public void saveBook_ShouldReturnSavedBook() {
+        // Arrange
+        when(bookService.save(any(Book.class))).thenReturn(book);
+
+        // Act
+        ResponseEntity<BookDTO> response = bookController.saveBook(bookDTO);
+
+        // Assert
+        verify(bookService, times(1)).save(any(Book.class));
+        assert response.getStatusCode() == HttpStatus.OK;
+        assert response.getBody() != null;
+        assert response.getBody().getName().equals("Sample Book");
+        // Add more assertions as needed
     }
 
     @Test
-    public void testUpdateBook() {
-    	book.setId(id);
-        when(service.updateBook(any(), any())).thenReturn(book);
-        BookDto result = controller.updateBook(id, book);
-        verify(service).updateBook(any(), any());
-        assertEquals(book, result);
+    public void getBookById_ShouldReturnBook() {
+        // Arrange
+        when(bookService.findById(1)).thenReturn(book);
+
+        // Act
+        ResponseEntity<BookDTO> response = bookController.getBookById(1);
+
+        // Assert
+        verify(bookService, times(1)).findById(1);
+        assert response.getStatusCode() == HttpStatus.OK;
+        assert response.getBody() != null;
+        assert response.getBody().getName().equals("Sample Book");
+        // Add more assertions as needed
     }
 
     @Test
-    public void testUpdateBookNotFound() {
-    	book.setId(id);
-        when(service.updateBook(any(), any())).thenThrow(exception);
-        NoSuchElementException result = assertThrows(NoSuchElementException.class, () -> controller.updateBook(id, book));
-        verify(service).updateBook(any(), any());
-        assertEquals(exception.getMessage(), result.getMessage());
+    public void updateBook_ShouldReturnUpdatedBook() {
+        // Arrange
+        when(bookService.findById(1)).thenReturn(book);
+        when(bookService.save(any(Book.class))).thenReturn(book);
+
+        // Act
+        ResponseEntity<BookDTO> response = bookController.updateBook(1, bookDTO);
+
+        // Assert
+        verify(bookService, times(1)).findById(1);
+        verify(bookService, times(1)).save(any(Book.class));
+        assert response.getStatusCode() == HttpStatus.OK;
+        assert response.getBody() != null;
+        assert response.getBody().getName().equals("Sample Book");
+        // Add more assertions as needed
     }
 
     @Test
-    public void testUpdateBookDifferentId() {
-        book.setId(id + 1);
-        IllegalArgumentException result = assertThrows(IllegalArgumentException.class, () -> controller.updateBook(id, book));
-        verify(service, never()).updateBook(any(), any());
-        assertEquals(
-        	String.format("Id for url (%d) and dto (%d) must be the same", id, book.getId()),
-        	result.getMessage());
-    }
+    public void deleteBook_ShouldReturnNoContent() {
+        // Act
+        ResponseEntity<Void> response = bookController.deleteBook(1);
 
-    @Test
-    public void testDeleteBook() {
-        Boolean result = controller.deleteBook(id);
-        verify(service).deleteBook(any());
-        assertTrue(result);
-    }
-
-    @Test
-    public void testDeleteBookNotFound() {
-        doThrow(exception).when(service).deleteBook(any());
-        NoSuchElementException result = assertThrows(NoSuchElementException.class, () -> controller.deleteBook(id));
-        verify(service).deleteBook(any());
-        assertEquals(exception.getMessage(), result.getMessage());
+        // Assert
+        verify(bookService, times(1)).deleteById(1);
+        assert response.getStatusCode() == HttpStatus.NO_CONTENT;
+        // Add more assertions as needed
     }
 }
+

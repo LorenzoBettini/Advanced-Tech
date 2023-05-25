@@ -1,13 +1,5 @@
 package com.book.management.controller;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,65 +10,48 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.book.management.entity.CategoryEntity;
-import com.book.management.mapper.CategoryMapper;
-import com.book.management.model.CategoryDto;
+import com.book.management.entity.Category;
+import com.book.management.mapper.CategoryConverter;
+import com.book.management.model.CategoryDTO;
 import com.book.management.service.CategoryService;
 
 @RestController
 @RequestMapping("/categories")
 public class CategoryController {
+	private final CategoryService categoryService;
 
-    @Autowired
-    private CategoryService categoryService;
+	public CategoryController(CategoryService categoryService) {
+		this.categoryService = categoryService;
+	}
 
-    @GetMapping
-    public List<CategoryDto> getAllCategories() {
-        List<CategoryEntity> categoryEntities = categoryService.getAllCategories();
-        return categoryEntities.stream()
-                .map(CategoryMapper::mapToDto)
-                .collect(Collectors.toList());
-    }
+	@PostMapping
+	public ResponseEntity<CategoryDTO> saveCategory(@RequestBody CategoryDTO categoryDTO) {
+		Category category = CategoryConverter.toEntity(categoryDTO);
+		Category savedCategory = categoryService.save(category);
+		CategoryDTO savedCategoryDTO = CategoryConverter.toDTO(savedCategory);
+		return ResponseEntity.ok(savedCategoryDTO);
+	}
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CategoryDto> getCategoryById(@PathVariable("id") Integer id) {
-        try {
-            CategoryEntity categoryEntity = categoryService.getCategoryById(id);
-            CategoryDto categoryDto = CategoryMapper.mapToDto(categoryEntity);
-            return ResponseEntity.ok(categoryDto);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
+	@GetMapping("/{id}")
+	public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable Long id) {
+		Category category = categoryService.findById(id);
+		CategoryDTO categoryDTO = CategoryConverter.toDTO(category);
+		return ResponseEntity.ok(categoryDTO);
+	}
 
-    @PostMapping
-    public ResponseEntity<CategoryDto> createCategory(@RequestBody @Valid CategoryDto categoryDto) {
-        CategoryEntity categoryEntity = CategoryMapper.mapToEntity(categoryDto);
-        CategoryEntity savedCategory = categoryService.saveCategory(categoryEntity);
-        CategoryDto savedCategoryDto = CategoryMapper.mapToDto(savedCategory);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedCategoryDto);
-    }
+	@PutMapping("/{id}")
+	public ResponseEntity<CategoryDTO> updateCategory(@PathVariable Long id, @RequestBody CategoryDTO categoryDTO) {
+		Category existingCategory = categoryService.findById(id);
+		existingCategory.setName(categoryDTO.getName());
 
-    @PutMapping("/{id}")
-    public ResponseEntity<CategoryDto> updateCategory(@PathVariable("id") Integer id,
-                                                      @RequestBody @Valid CategoryDto categoryDto) {
-        try {
-            CategoryEntity categoryEntity = CategoryMapper.mapToEntity(categoryDto);
-            CategoryEntity updatedCategory = categoryService.updateCategory(id, categoryEntity);
-            CategoryDto updatedCategoryDto = CategoryMapper.mapToDto(updatedCategory);
-            return ResponseEntity.ok(updatedCategoryDto);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
+		Category updatedCategory = categoryService.save(existingCategory);
+		CategoryDTO updatedCategoryDTO = CategoryConverter.toDTO(updatedCategory);
+		return ResponseEntity.ok(updatedCategoryDTO);
+	}
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable("id") Integer id) {
-        try {
-            categoryService.deleteCategory(id);
-            return ResponseEntity.noContent().build();
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+		categoryService.deleteById(id);
+		return ResponseEntity.noContent().build();
+	}
 }
