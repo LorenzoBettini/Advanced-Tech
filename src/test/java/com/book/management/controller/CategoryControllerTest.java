@@ -51,7 +51,7 @@ public class CategoryControllerTest {
         assert response.getStatusCode() == HttpStatus.OK;
         assert response.getBody() != null;
         assert response.getBody().getName().equals("Sample Category");
-        // Add more assertions as needed
+       
     }
 
     @Test
@@ -67,7 +67,7 @@ public class CategoryControllerTest {
         assert response.getStatusCode() == HttpStatus.OK;
         assert response.getBody() != null;
         assert response.getBody().getName().equals("Sample Category");
-        // Add more assertions as needed
+
     }
 
     @Test
@@ -85,7 +85,7 @@ public class CategoryControllerTest {
         assert response.getStatusCode() == HttpStatus.OK;
         assert response.getBody() != null;
         assert response.getBody().getName().equals("Sample Category");
-        // Add more assertions as needed
+ 
     }
 
     @Test
@@ -96,7 +96,7 @@ public class CategoryControllerTest {
         // Assert
         verify(categoryService, times(1)).deleteById(1L);
         assert response.getStatusCode() == HttpStatus.NO_CONTENT;
-        // Add more assertions as needed
+
     }
 }
 

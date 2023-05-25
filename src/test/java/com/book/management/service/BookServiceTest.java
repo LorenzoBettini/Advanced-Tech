@@ -67,7 +67,7 @@ public class BookServiceTest {
 		verify(bookRepository, times(1)).findById(1);
 		assert foundBook != null;
 		assert foundBook.getName().equals("Sample Book");
-		// Add more assertions as needed
+		
 	}
 
 	@Test

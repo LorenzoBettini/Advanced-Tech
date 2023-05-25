@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -19,13 +17,12 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.book.management.model.BookDTO;
+import com.book.management.model.CategoryDTO;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
-public class BookControllerTestIT {
-
+public class CategoryControllerTestIT {
 	@Container
 	private static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:5.7").withDatabaseName("mydb")
 			.withUsername("root").withPassword("password");
@@ -47,46 +44,39 @@ public class BookControllerTestIT {
 	}
 
 	@Test
-	void saveBook_ShouldReturnSavedBook() {
+	void saveCategory_ShouldReturnSavedCategory() {
 		// Arrange
-		BookDTO bookDTO = new BookDTO();
-		bookDTO.setName("Test Book");
-		bookDTO.setAuthor("Fahad");
-		bookDTO.setPrice(19);
+		CategoryDTO categoryDTO = new CategoryDTO();
+		categoryDTO.setName("Test Category");
 
-		String url = "http://localhost:" + port + "/books";
+		String url = "http://localhost:" + port + "/categories";
 
 		// Act
-		ResponseEntity<BookDTO> response = restTemplate.postForEntity(url, bookDTO, BookDTO.class);
+		ResponseEntity<CategoryDTO> response = restTemplate.postForEntity(url, categoryDTO, CategoryDTO.class);
 
 		// Assert
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		BookDTO savedBookDTO = response.getBody();
-		assertEquals(bookDTO.getName(), savedBookDTO.getName());
-		assertEquals(bookDTO.getAuthor(), savedBookDTO.getAuthor());
-		assertEquals(bookDTO.getPrice(), savedBookDTO.getPrice());
+		CategoryDTO savedCategoryDTO = response.getBody();
+		assertEquals(categoryDTO.getName(), savedCategoryDTO.getName());
 	}
 
 	@Test
-	void updateBook_ExistingBookId_ShouldReturnUpdatedBook() {
+	void getCategoryById_ExistingCategoryId_ShouldReturnCategory() {
 		// Arrange
-		BookDTO bookDTO = new BookDTO();
-		bookDTO.setName("Updated Book");
-		bookDTO.setAuthor("Fahad");
-		bookDTO.setPrice(2999);
+		CategoryDTO expectedCategoryDTO = new CategoryDTO();
+		expectedCategoryDTO.setId(1L);
+		expectedCategoryDTO.setName("Test Category");
 
-		String url = "http://localhost:" + port + "/books/1";
+		String url = "http://localhost:" + port + "/categories/1";
 
 		// Act
-		HttpEntity<BookDTO> requestEntity = new HttpEntity<>(bookDTO);
-		ResponseEntity<BookDTO> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, BookDTO.class);
+		ResponseEntity<CategoryDTO> response = restTemplate.getForEntity(url, CategoryDTO.class);
 
 		// Assert
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		BookDTO updatedBookDTO = response.getBody();
-		assertEquals(bookDTO.getName(), updatedBookDTO.getName());
-		assertEquals(bookDTO.getAuthor(), updatedBookDTO.getAuthor());
-		assertEquals(bookDTO.getPrice(), updatedBookDTO.getPrice());
+		CategoryDTO categoryDTO = response.getBody();
+		assertEquals(expectedCategoryDTO.getId(), categoryDTO.getId());
+		assertEquals(expectedCategoryDTO.getName(), categoryDTO.getName());
 	}
 
 }

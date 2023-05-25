@@ -31,13 +31,13 @@ public class BookControllerTest {
         // Initialize test data
         bookDTO = new BookDTO();
         bookDTO.setName("Sample Book");
-        bookDTO.setAuthor("John Doe");
+        bookDTO.setAuthor("Fahad");
         bookDTO.setPrice(9);
 
         book = new Book();
         book.setId(1);
         book.setName("Sample Book");
-        book.setAuthor("John Doe");
+        book.setAuthor("Fahad");
         book.setPrice(9);
     }
 
@@ -54,7 +54,7 @@ public class BookControllerTest {
         assert response.getStatusCode() == HttpStatus.OK;
         assert response.getBody() != null;
         assert response.getBody().getName().equals("Sample Book");
-        // Add more assertions as needed
+        
     }
 
     @Test
@@ -70,7 +70,7 @@ public class BookControllerTest {
         assert response.getStatusCode() == HttpStatus.OK;
         assert response.getBody() != null;
         assert response.getBody().getName().equals("Sample Book");
-        // Add more assertions as needed
+
     }
 
     @Test
@@ -88,7 +88,7 @@ public class BookControllerTest {
         assert response.getStatusCode() == HttpStatus.OK;
         assert response.getBody() != null;
         assert response.getBody().getName().equals("Sample Book");
-        // Add more assertions as needed
+       
     }
 
     @Test
@@ -99,7 +99,7 @@ public class BookControllerTest {
         // Assert
         verify(bookService, times(1)).deleteById(1);
         assert response.getStatusCode() == HttpStatus.NO_CONTENT;
-        // Add more assertions as needed
+     
     }
 }
 
