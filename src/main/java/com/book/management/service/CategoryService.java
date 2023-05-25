@@ -1,53 +1,30 @@
 package com.book.management.service;
 
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.book.management.entity.CategoryEntity;
+import com.book.management.entity.Category;
 import com.book.management.repository.CategoryRepository;
 
 @Service
 public class CategoryService {
+	private final CategoryRepository categoryRepository;
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+	public CategoryService(CategoryRepository categoryRepository) {
+		this.categoryRepository = categoryRepository;
+	}
 
-    public CategoryEntity getCategoryById(Integer id) {
-        Optional<CategoryEntity> categoryOptional = categoryRepository.findById(id);
-        if (categoryOptional.isPresent()) {
-            return categoryOptional.get();
-        }
-        throw new NoSuchElementException("Category not found");
-    }
+	public Category save(Category category) {
+		return categoryRepository.save(category);
+	}
 
-    public List<CategoryEntity> getAllCategories() {
-        return categoryRepository.findAll();
-    }
+	public Category findById(Long id) {
+		return categoryRepository.findById(id)
+				.orElseThrow(() -> new NoSuchElementException("Category not found with id: " + id));
+	}
 
-    public CategoryEntity saveCategory(CategoryEntity category) {
-        return categoryRepository.save(category);
-    }
-
-    public CategoryEntity updateCategory(Integer id, CategoryEntity category) {
-        Optional<CategoryEntity> categoryOptional = categoryRepository.findById(id);
-        if (categoryOptional.isPresent()) {
-            category.setId(id);
-            return categoryRepository.save(category);
-        }
-        throw new NoSuchElementException("Category not found");
-    }
-
-    public void deleteCategory(Integer id) {
-        Optional<CategoryEntity> categoryOptional = categoryRepository.findById(id);
-        if (categoryOptional.isPresent()) {
-            categoryRepository.deleteById(id);
-        } else {
-            throw new NoSuchElementException("Category not found");
-        }
-    }
+	public void deleteById(Long id) {
+		categoryRepository.deleteById(id);
+	}
 }
-

@@ -1,66 +1,30 @@
 package com.book.management.service;
 
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.book.management.entity.BookEntity;
-import com.book.management.entity.CategoryEntity;
-import com.book.management.mapper.BeanMapper;
-import com.book.management.model.BookDto;
+import com.book.management.entity.Book;
 import com.book.management.repository.BookRepository;
-import com.book.management.repository.CategoryRepository;
 
 @Service
 public class BookService {
+	private final BookRepository bookRepository;
 
-	@Autowired
-	private BookRepository bookRepository;
-
-	@Autowired
-	private CategoryRepository categoryRepository;
-
-	public List<BookDto> getBooks() {
-		List<BookEntity> books = bookRepository.findAll();
-		return books.stream().map(BeanMapper::mapToDto).collect(Collectors.toList());
+	public BookService(BookRepository bookRepository) {
+		this.bookRepository = bookRepository;
 	}
 
-	public BookDto getBook(Integer id) {
-		BookEntity book = bookRepository.findById(id)
-				.orElseThrow(() -> new NoSuchElementException("There is no Book Found with " + id));
-		return BeanMapper.mapToDto(book);
+	public Book save(Book book) {
+		return bookRepository.save(book);
 	}
 
-	public BookDto saveBook(BookDto book) {
-		BookEntity newBook = BeanMapper.mapToEntity(book);
-		return BeanMapper.mapToDto(bookRepository.save(newBook));
+	public Book findById(Integer id) {
+		return bookRepository.findById(id)
+				.orElseThrow(() -> new NoSuchElementException("Book not found with id: " + id));
 	}
 
-	public BookDto updateBook(Integer id, BookDto book) {
-		if (!bookRepository.existsById(id)) {
-			throw new NoSuchElementException("Please insert correct Id " + id);
-		}
-		BookEntity updatedBook = bookRepository.save(BeanMapper.mapToEntity(book));
-		return BeanMapper.mapToDto(bookRepository.save(updatedBook));
-	}
-
-	public void deleteBook(Integer id) {
-		if (!bookRepository.existsById(id)) {
-			throw new NoSuchElementException("Book you selected is not Present with " + id);
-		}
+	public void deleteById(Integer id) {
 		bookRepository.deleteById(id);
 	}
-
-    public List<BookDto> getBooksByCategory(Integer categoryId) {
-        CategoryEntity category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new NoSuchElementException("There is no Category Found with ID " + categoryId));
-        List<BookEntity> books = bookRepository.findByCategory(category);
-        return books.stream()
-                .map(BeanMapper::mapToDto)
-                .collect(Collectors.toList());
-    }
-
 }
