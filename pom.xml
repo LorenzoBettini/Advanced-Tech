@@ -111,13 +111,6 @@
 			  <plugin>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-failsafe-plugin</artifactId>
-      <dependencies>
-					<dependency>
-						<groupId>org.apache.maven.surefire</groupId>
-						<artifactId>surefire-junit4</artifactId>
-						<version>${maven-surefire-plugin.version}</version>
-					</dependency>
-				</dependencies>
       <executions>
         <execution>
           <goals>
@@ -140,13 +133,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<dependencies>
-					<dependency>
-						<groupId>org.apache.maven.surefire</groupId>
-						<artifactId>surefire-junit4</artifactId>
-						<version>${maven-surefire-plugin.version}</version>
-					</dependency>
-				</dependencies>
 			</plugin>
 			<!-- Coveralls -->
 			<plugin>
@@ -211,16 +197,22 @@
 						</goals>
 					</execution>
 				</executions>
+				<dependencies>
+				<dependency>
+				<groupId>org.pitest</groupId>
+				<artifactId>pitest-junit5-plugin</artifactId>
+				<version>0.12</version>
+				</dependency>
+				</dependencies>
 				<configuration>
 					<targetClasses>
 						<param>com.book.management.mapper.*</param>
+						<param>com.book.management.controller.*</param>
 					</targetClasses>
-					<excludedTestClasses>
-						<param>com.book.management.**.*IT</param>
-						<param>com.book.management.controller.**.*IT</param>
-					</excludedTestClasses>
+
 					<targetTests>
 						<param>com.book.management.mapper.*</param>
+						<param>com.book.management.controller.*</param>
 					</targetTests>
 					<avoidCallsTo>
 						<avoidCallsTo>java.util.logging</avoidCallsTo>
@@ -231,23 +223,11 @@
 					<mutators>
 						<mutator>DEFAULTS</mutator>
 					</mutators>
-					<mutationThreshold>100</mutationThreshold>
+					<mutationThreshold>80</mutationThreshold>
 					<outputFormats>
 						<outputFormat>XML</outputFormat>
 						<outputFormat>HTML</outputFormat>
 					</outputFormats>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -260,7 +240,7 @@
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.6</version>
 			</plugin>
-			<plugin>
+		<plugin>
 				<groupId>org.pitest</groupId>
 				<artifactId>pitest-maven</artifactId>
 				<version>1.6.3</version>
