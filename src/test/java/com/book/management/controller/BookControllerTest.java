@@ -1,5 +1,8 @@
 package com.book.management.controller;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +15,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.book.management.entity.Book;
+import com.book.management.entity.Category;
+import com.book.management.mapper.CategoryConverter;
 import com.book.management.model.BookDTO;
+import com.book.management.model.CategoryDTO;
 import com.book.management.service.BookService;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,23 +79,55 @@ public class BookControllerTest {
 
     }
 
+  
+
     @Test
-    public void updateBook_ShouldReturnUpdatedBook() {
+    void updateBook_ExistingBookId_ShouldReturnUpdatedBook() {
         // Arrange
-        when(bookService.findById(1)).thenReturn(book);
+        Integer bookId = 1;
+        when(bookService.findById(bookId)).thenReturn(book);
         when(bookService.save(any(Book.class))).thenReturn(book);
 
+        // Set the category in the bookDTO
+        CategoryDTO categoryDTO = new CategoryDTO();
+        categoryDTO.setId(1L);
+        categoryDTO.setName("Sample Category");
+        bookDTO.setCategory(categoryDTO);
+
         // Act
-        ResponseEntity<BookDTO> response = bookController.updateBook(1, bookDTO);
+        ResponseEntity<BookDTO> response = bookController.updateBook(bookId, bookDTO);
 
         // Assert
-        verify(bookService, times(1)).findById(1);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        BookDTO updatedBookDTO = response.getBody();
+        assertEquals(bookDTO.getName(), updatedBookDTO.getName());
+        assertEquals(bookDTO.getAuthor(), updatedBookDTO.getAuthor());
+        assertEquals(bookDTO.getPrice(), updatedBookDTO.getPrice());
+
+        verify(bookService, times(1)).findById(bookId);
         verify(bookService, times(1)).save(any(Book.class));
-        assert response.getStatusCode() == HttpStatus.OK;
-        assert response.getBody() != null;
-        assert response.getBody().getName().equals("Sample Book");
-       
+        verify(bookService).findById(eq(bookId));
+        verify(bookService).save(any(Book.class));
+
+        // Add assertions to check if the existing book object has been updated
+        assertEquals(bookDTO.getName(), book.getName());
+        assertEquals(bookDTO.getAuthor(), book.getAuthor());
+        assertEquals(bookDTO.getPrice(), book.getPrice());
+
+        // Check the category condition
+        if (bookDTO.getCategory() != null) {
+            assertNotNull(book.getCategory());
+
+            // Convert the categoryDTO and assert the category ID
+            CategoryDTO categoryDTO1 = bookDTO.getCategory();
+            Category category = CategoryConverter.toEntity(categoryDTO1);
+            assertEquals(category.getId(), book.getCategory().getId());
+        } else {
+            assertNull(book.getCategory());
+        }
     }
+
+
 
     @Test
     public void deleteBook_ShouldReturnNoContent() {
