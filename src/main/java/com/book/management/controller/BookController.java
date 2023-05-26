@@ -21,44 +21,60 @@ import com.book.management.service.BookService;
 @RestController
 @RequestMapping("/books")
 public class BookController {
-	private final BookService bookService;
+    private final BookService bookService;
 
-	public BookController(BookService bookService) {
-		this.bookService = bookService;
-	}
+    public BookController(BookService bookService) {
+        this.bookService = bookService;
+    }
 
-	@PostMapping
-	public ResponseEntity<BookDTO> saveBook(@RequestBody BookDTO bookDTO) {
-		Book book = BookConverter.toEntity(bookDTO);
-		Book savedBook = bookService.save(book);
-		BookDTO savedBookDTO = BookConverter.toDTO(savedBook);
-		return ResponseEntity.ok(savedBookDTO);
-	}
+    @PostMapping
+    public ResponseEntity<BookDTO> saveBook(@RequestBody BookDTO bookDTO) {
+        // Validate the bookDTO
+        if (bookDTO == null || bookDTO.getName() == null || bookDTO.getAuthor() == null || bookDTO.getPrice() == null) {
+            return ResponseEntity.badRequest().build();
+        }
 
-	@GetMapping("/{id}")
-	public ResponseEntity<BookDTO> getBookById(@PathVariable Integer id) {
-		Book book = bookService.findById(id);
-		BookDTO bookDTO = BookConverter.toDTO(book);
-		return ResponseEntity.ok(bookDTO);
-	}
+        Book book = BookConverter.toEntity(bookDTO);
+        Book savedBook = bookService.save(book);
+        BookDTO savedBookDTO = BookConverter.toDTO(savedBook);
+        return ResponseEntity.ok(savedBookDTO);
+    }
 
-	@PutMapping("/{id}")
-	public ResponseEntity<BookDTO> updateBook(@PathVariable Integer id, @RequestBody BookDTO bookDTO) {
-		Book existingBook = bookService.findById(id);
-		existingBook.setName(bookDTO.getName());
-		existingBook.setAuthor(bookDTO.getAuthor());
-		existingBook.setPrice(bookDTO.getPrice());
+    @GetMapping("/{id}")
+    public ResponseEntity<BookDTO> getBookById(@PathVariable Integer id) {
+        Book book = bookService.findById(id);
+        if (book == null) {
+            return ResponseEntity.notFound().build();
+        }
 
-		CategoryDTO categoryDTO = bookDTO.getCategory();
-		if (categoryDTO != null) {
-			Category category = CategoryConverter.toEntity(categoryDTO);
-			existingBook.setCategory(category);
-		}
+        BookDTO bookDTO = BookConverter.toDTO(book);
+        return ResponseEntity.ok(bookDTO);
+    }
 
-		Book updatedBook = bookService.save(existingBook);
-		BookDTO updatedBookDTO = BookConverter.toDTO(updatedBook);
-		return ResponseEntity.ok(updatedBookDTO);
-	}
+    @PutMapping("/{id}")
+    public ResponseEntity<BookDTO> updateBook(@PathVariable Integer id, @RequestBody BookDTO bookDTO) {
+        Book existingBook = bookService.findById(id);
+        if (existingBook == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+   
+
+        existingBook.setName(bookDTO.getName());
+        existingBook.setAuthor(bookDTO.getAuthor());
+        existingBook.setPrice(bookDTO.getPrice());
+
+        CategoryDTO categoryDTO = bookDTO.getCategory();
+        if (categoryDTO != null) {
+            Category category = CategoryConverter.toEntity(categoryDTO);
+            existingBook.setCategory(category);
+        }
+
+        Book updatedBook = bookService.save(existingBook);
+        BookDTO updatedBookDTO = BookConverter.toDTO(updatedBook);
+        return ResponseEntity.ok(updatedBookDTO);
+    }
+
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteBook(@PathVariable Integer id) {
