@@ -206,13 +206,13 @@
 				</dependencies>
 				<configuration>
 					<targetClasses>
-						
+						<param>com.book.management.mapper.*</param>
 						<param>com.book.management.controller.*</param>
 				
 					</targetClasses>
 
 					<targetTests>
-					
+						<param>com.book.management.mapper.*</param>
 						<param>com.book.management.controller.*</param>
 						
 					</targetTests>
