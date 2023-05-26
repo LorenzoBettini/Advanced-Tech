@@ -24,7 +24,7 @@ import com.book.management.model.CategoryDTO;
 @Testcontainers
 public class CategoryControllerTestIT {
 	@Container
-	private static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:latest").withDatabaseName("mydb")
+	private static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:5.7").withDatabaseName("mydb")
 			.withUsername("root").withPassword("password");
 
 	@LocalServerPort
