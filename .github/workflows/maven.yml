@@ -65,13 +65,3 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COVERALLS_REPO_TOKEN: a3geusaxwVYYwdIGySF8Jkhy4BQE2FBu3
-
-    - name: Build and Push Docker Image
-      uses: mr-smithers-excellent/docker-build-push@v5
-      with:
-          image: fahadnadeemx/book-management
-          tags: latest
-          registry: docker.io
-          dockerfile: Dockerfile
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
