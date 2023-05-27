@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +20,7 @@ import com.book.management.entity.Book;
 import com.book.management.repository.BookRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class BookServiceTest {
+class BookServiceTest {
 	@Mock
 	private BookRepository bookRepository;
 
@@ -41,7 +40,7 @@ public class BookServiceTest {
 	}
 
 	@Test
-	public void save_ShouldReturnSavedBook() {
+	void save_ShouldReturnSavedBook() {
 		// Arrange
 		when(bookRepository.save(any(Book.class))).thenReturn(book);
 
@@ -56,7 +55,7 @@ public class BookServiceTest {
 	}
 
 	@Test
-	public void findById_WithValidId_ShouldReturnBook() {
+	void findById_WithValidId_ShouldReturnBook() {
 		// Arrange
 		when(bookRepository.findById(1)).thenReturn(Optional.of(book));
 
@@ -67,11 +66,11 @@ public class BookServiceTest {
 		verify(bookRepository, times(1)).findById(1);
 		assert foundBook != null;
 		assert foundBook.getName().equals("Sample Book");
-		
+
 	}
 
 	@Test
-	public void findById_WithInvalidId_ShouldThrowException() {
+	void findById_WithInvalidId_ShouldThrowException() {
 		// Arrange
 		when(bookRepository.findById(2)).thenReturn(Optional.empty());
 
@@ -80,7 +79,7 @@ public class BookServiceTest {
 	}
 
 	@Test
-	public void deleteById_ShouldCallRepositoryDeleteById() {
+	void deleteById_ShouldCallRepositoryDeleteById() {
 		// Act
 		bookService.deleteById(1);
 

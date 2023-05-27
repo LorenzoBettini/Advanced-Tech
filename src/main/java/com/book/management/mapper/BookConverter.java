@@ -6,6 +6,9 @@ import com.book.management.model.BookDTO;
 import com.book.management.model.CategoryDTO;
 
 public class BookConverter {
+	private BookConverter() {
+		// Private constructor to prevent instantiation of this class
+	}
 
 	public static BookDTO toDTO(Book book) {
 		BookDTO bookDTO = new BookDTO();

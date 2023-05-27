@@ -8,7 +8,7 @@ import com.book.management.entity.Category;
 import com.book.management.model.BookDTO;
 import com.book.management.model.CategoryDTO;
 
-public class BookConverterTest {
+class BookConverterTest {
     @Test
     void toDTO_ShouldConvertBookToBookDTO() {
         // Arrange

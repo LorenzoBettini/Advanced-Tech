@@ -13,7 +13,7 @@ import org.mockito.MockitoAnnotations;
 import com.book.management.entity.Category;
 import com.book.management.repository.CategoryRepository;
 
-public class CategoryServiceTest {
+class CategoryServiceTest {
 	@Mock
 	private CategoryRepository categoryRepository;
 	private CategoryService categoryService;

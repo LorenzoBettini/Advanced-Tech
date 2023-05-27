@@ -7,6 +7,10 @@ import com.book.management.model.CategoryDTO;
 
 @Component
 public class CategoryConverter {
+	
+	private CategoryConverter() {
+        // Private constructor to prevent instantiation of this class
+    }
 
 	public static CategoryDTO toDTO(Category category) {
 		CategoryDTO categoryDTO = new CategoryDTO();

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import com.book.management.entity.Category;
 import com.book.management.model.CategoryDTO;
 
-public class CategoryConverterTest {
+class CategoryConverterTest {
     @Test
     void toDTO_ShouldConvertCategoryToCategoryDTO() {
         // Arrange

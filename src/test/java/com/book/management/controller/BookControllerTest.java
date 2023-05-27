@@ -82,18 +82,18 @@ class BookControllerTest {
 
 	@Test
 	void saveBook_WithIncompleteBookDTO_ShouldReturnBadRequest() {
-		// Arrange
-		bookDTO.setName("Sample Book");
-		bookDTO.setAuthor(null);
-		bookDTO.setPrice(9);
+	    // Arrange
+	    bookDTO.setName(null);  // Set the name to null to trigger the condition
+	    bookDTO.setAuthor("Fahad");
+	    bookDTO.setPrice(9);
 
-		// Act
-		ResponseEntity<BookDTO> response = bookController.saveBook(bookDTO);
+	    // Act
+	    ResponseEntity<BookDTO> response = bookController.saveBook(bookDTO);
 
-		// Assert
-		verify(bookService, never()).save(any(Book.class));
-		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-		assertNull(response.getBody());
+	    // Assert
+	    verify(bookService, never()).save(any(Book.class));
+	    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+	    assertNull(response.getBody());
 	}
 
 	@Test
@@ -150,7 +150,7 @@ class BookControllerTest {
 
 		verify(bookService, times(1)).findById(bookId);
 		verify(bookService, times(1)).save(any(Book.class));
-		verify(bookService).findById(eq(bookId));
+		verify(bookService).findById(bookId);
 		verify(bookService).save(any(Book.class));
 
 		// Add assertions to check if the existing book object has been updated
