@@ -16,3 +16,4 @@ Sonar Cloud Coverage and Ratings:
 
 [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=fahadnadeemx_ATT-Project)](https://sonarcloud.io/summary/new_code?id=fahadnadeemx_Advanced-Tech)
 [![Coverage Status](https://coveralls.io/repos/github/fahadnadeemx/Advanced-Tech/badge.svg?branch=main)](https://coveralls.io/github/fahadnadeemx/Advanced-Tech?branch=main)
+[![Java CI with Maven](https://github.com/fahadnadeemx/Advanced-Tech/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/fahadnadeemx/Advanced-Tech/actions/workflows/maven.yml)
