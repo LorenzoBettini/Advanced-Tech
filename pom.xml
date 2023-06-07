@@ -207,13 +207,13 @@
 				<configuration>
 					<targetClasses>
 						<param>com.book.management.mapper.*</param>
-						<param>com.book.management.controller.*</param>
+						<param>com.book.management.service.*</param>
 				
 					</targetClasses>
 
 					<targetTests>
 						<param>com.book.management.mapper.*</param>
-						<param>com.book.management.controller.*</param>
+						<param>com.book.management.service.*</param>
 						
 					</targetTests>
 					<avoidCallsTo>
