@@ -1,6 +1,7 @@
 package com.book.management.service;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -49,9 +50,7 @@ class BookServiceTest {
 
 		// Assert
 		verify(bookRepository, times(1)).save(any(Book.class));
-		assert savedBook != null;
-		assert savedBook.getName().equals("Sample Book");
-		// Add more assertions as needed
+		assertEquals("Sample Book", savedBook.getName());
 	}
 
 	@Test
@@ -64,9 +63,7 @@ class BookServiceTest {
 
 		// Assert
 		verify(bookRepository, times(1)).findById(1);
-		assert foundBook != null;
-		assert foundBook.getName().equals("Sample Book");
-
+		assertEquals("Sample Book", foundBook.getName());
 	}
 
 	@Test
