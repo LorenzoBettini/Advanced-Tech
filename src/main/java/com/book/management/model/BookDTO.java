@@ -15,7 +15,7 @@ public class BookDTO {
 	@NotNull
 	private Integer price;
 
-	private CategoryDTO category; 
+	private CategoryDTO category;
 
 	public CategoryDTO getCategory() {
 		return category;

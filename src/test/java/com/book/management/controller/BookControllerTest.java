@@ -81,56 +81,55 @@ class BookControllerTest {
 
 	@Test
 	void saveBook_WithoutBookName_BookDTO_ShouldReturnBadRequest() {
-	    // Arrange
-	    bookDTO.setName(null);  // Set the name to null to trigger the condition
-	    bookDTO.setAuthor("Fahad");
-	    bookDTO.setPrice(9);
+		// Arrange
+		bookDTO.setName(null); // Set the name to null to trigger the condition
+		bookDTO.setAuthor("Fahad");
+		bookDTO.setPrice(9);
 
-	    // Act
-	    ResponseEntity<BookDTO> response = bookController.saveBook(bookDTO);
+		// Act
+		ResponseEntity<BookDTO> response = bookController.saveBook(bookDTO);
 
-	    // Assert
-	    verify(bookService, never()).save(any(Book.class));
-	    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-	    assertNull(response.getBody());
-	   
+		// Assert
+		verify(bookService, never()).save(any(Book.class));
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+		assertNull(response.getBody());
+
 	}
 
 	@Test
 	void saveBook_WithoutAuthor_BookDTO_ShouldReturnBadRequest() {
-	    // Arrange
-	    bookDTO.setName("Book Name");  // Set the name to null to trigger the condition
-	    bookDTO.setAuthor(null);
-	    bookDTO.setPrice(9);
+		// Arrange
+		bookDTO.setName("Book Name"); // Set the name to null to trigger the condition
+		bookDTO.setAuthor(null);
+		bookDTO.setPrice(9);
 
-	    // Act
-	    ResponseEntity<BookDTO> response = bookController.saveBook(bookDTO);
+		// Act
+		ResponseEntity<BookDTO> response = bookController.saveBook(bookDTO);
 
-	    // Assert
-	    verify(bookService, never()).save(any(Book.class));
-	    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-	    assertNull(response.getBody());
-	   
+		// Assert
+		verify(bookService, never()).save(any(Book.class));
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+		assertNull(response.getBody());
+
 	}
-	
+
 	@Test
 	void saveBook_WithoutPrice_BookDTO_ShouldReturnBadRequest() {
-	    // Arrange
-	    bookDTO.setName("Book Name");  // Set the name to null to trigger the condition
-	    bookDTO.setAuthor("Fahad");
-	    bookDTO.setPrice(null);
+		// Arrange
+		bookDTO.setName("Book Name"); // Set the name to null to trigger the condition
+		bookDTO.setAuthor("Fahad");
+		bookDTO.setPrice(null);
 
-	    // Act
-	    ResponseEntity<BookDTO> response = bookController.saveBook(bookDTO);
+		// Act
+		ResponseEntity<BookDTO> response = bookController.saveBook(bookDTO);
 
-	    // Assert
-	    verify(bookService, never()).save(any(Book.class));
-	    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-	    assertNull(response.getBody());
-	   
+		// Assert
+		verify(bookService, never()).save(any(Book.class));
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+		assertNull(response.getBody());
+
 	}
-	
-	
+
 	@Test
 	void getBookById_WithValidId_ShouldReturnBook() {
 		// Arrange
@@ -217,45 +216,45 @@ class BookControllerTest {
 
 	@Test
 	void updateBook_WithNonNullCategoryDTO_ShouldSetCategory() {
-	    // Arrange
-	    Integer bookId = 1;
-	    BookDTO bookDTO = new BookDTO();
-	    bookDTO.setName("Book Name");
-	    bookDTO.setAuthor("Author Name");
-	    bookDTO.setPrice(9);
-	    
-	    CategoryDTO categoryDTO = new CategoryDTO();
-	    categoryDTO.setId(1L);
-	    categoryDTO.setName("Category Name");
-	    bookDTO.setCategory(categoryDTO);
-	    
-	    Book existingBook = new Book();
-	    existingBook.setId(bookId);
-	    
-	    // Mocking dependencies and setting up behavior
-	    when(bookService.findById(bookId)).thenReturn(existingBook);
-	    when(bookService.save(existingBook)).thenReturn(existingBook);
-	    
-	    // Act
-	    ResponseEntity<BookDTO> response = bookController.updateBook(bookId, bookDTO);
-	    
-	    // Assert
-	    verify(bookService).findById(bookId);
-	    verify(bookService).save(existingBook);
-	    
-	    assertEquals(HttpStatus.OK, response.getStatusCode());
-	    assertNotNull(response.getBody());
-	    
-	    BookDTO updatedBookDTO = response.getBody();
-	    assertNotNull(updatedBookDTO);
-	    assertEquals("Book Name", updatedBookDTO.getName());
-	    assertEquals("Author Name", updatedBookDTO.getAuthor());
-	    assertEquals(bookDTO.getPrice(), updatedBookDTO.getPrice());
-	    
-	    Category updatedCategory = existingBook.getCategory();
-	    assertNotNull(updatedCategory);
-	    assertEquals("Category Name", updatedCategory.getName());
-	    // Add more assertions for the category if needed
+		// Arrange
+		Integer bookId = 1;
+		BookDTO bookDTO = new BookDTO();
+		bookDTO.setName("Book Name");
+		bookDTO.setAuthor("Author Name");
+		bookDTO.setPrice(9);
+
+		CategoryDTO categoryDTO = new CategoryDTO();
+		categoryDTO.setId(1L);
+		categoryDTO.setName("Category Name");
+		bookDTO.setCategory(categoryDTO);
+
+		Book existingBook = new Book();
+		existingBook.setId(bookId);
+
+		// Mocking dependencies and setting up behavior
+		when(bookService.findById(bookId)).thenReturn(existingBook);
+		when(bookService.save(existingBook)).thenReturn(existingBook);
+
+		// Act
+		ResponseEntity<BookDTO> response = bookController.updateBook(bookId, bookDTO);
+
+		// Assert
+		verify(bookService).findById(bookId);
+		verify(bookService).save(existingBook);
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertNotNull(response.getBody());
+
+		BookDTO updatedBookDTO = response.getBody();
+		assertNotNull(updatedBookDTO);
+		assertEquals("Book Name", updatedBookDTO.getName());
+		assertEquals("Author Name", updatedBookDTO.getAuthor());
+		assertEquals(bookDTO.getPrice(), updatedBookDTO.getPrice());
+
+		Category updatedCategory = existingBook.getCategory();
+		assertNotNull(updatedCategory);
+		assertEquals("Category Name", updatedCategory.getName());
+		// Add more assertions for the category if needed
 	}
 
 	@Test
