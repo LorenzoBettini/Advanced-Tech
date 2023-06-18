@@ -2,8 +2,6 @@ package com.book.management.controller;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,24 +25,13 @@ import com.book.management.model.BookDTO;
 class BookControllerTestIT {
 
 	@Container
-	private static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:5.7").withDatabaseName("mydb")
-			.withUsername("root").withPassword("password").withReuse(true);
+	private static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:latest");
 
 	@LocalServerPort
 	private int port;
 
 	@Autowired
 	private TestRestTemplate restTemplate;
-
-	@BeforeAll
-	static void beforeAll() {
-		mysql.start();
-	}
-
-	@AfterAll
-	static void afterAll() {
-		mysql.stop();
-	}
 
 	@Test
 	void saveBook_ShouldReturnSavedBook() {
