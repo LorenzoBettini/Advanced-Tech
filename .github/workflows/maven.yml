@@ -29,9 +29,6 @@ jobs:
         distribution: 'temurin'
         cache: maven
       
-    - name: Pull Ryuk image
-      run: docker pull testcontainers/ryuk:0.3.0
-      
     - name: Build with Maven
       run: mvn clean verify
     
