@@ -28,9 +28,6 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: maven
-        
-    - name: Pull Ryuk image
-      run: docker pull testcontainers/ryuk:0.3.0
       
     - name: Build with Maven
       run: mvn clean verify
@@ -52,9 +49,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=fahadnadeemx_Advanced-Tech
-
-    - name: Unit and Integration Tests
-      run: mvn verify -Pjacoco
 
     - name: Coveralls Report
       run: >
