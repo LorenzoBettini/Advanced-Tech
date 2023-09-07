@@ -21,11 +21,11 @@ import com.book.management.model.BookDTO;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
+//@Testcontainers
 class BookControllerTestIT {
 
-	@Container
-	private static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:latest");
+//	@Container
+//	private static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:latest");
 
 	@LocalServerPort
 	private int port;
