@@ -3,7 +3,6 @@ package com.book.management.controller;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -12,23 +11,33 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.book.management.model.BookDTO;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@Testcontainers
+@Testcontainers
 class BookControllerTestIT {
 
-//	@Container
-//	private static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:latest");
+	@Container
+	public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.1.0").withUsername("FahadNadeem")
+			.withPassword("Book123").withDatabaseName("bookmanagement");
 
 	@LocalServerPort
 	private int port;
+
+	@DynamicPropertySource
+	static void databaseProperties(DynamicPropertyRegistry registry) {
+		registry.add("spring.jpa.hibernate.ddl-auto", () -> "update");
+		registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.MySQL8Dialect");
+		registry.add("spring.datasource.url", mySQLContainer::getJdbcUrl);
+		registry.add("spring.datasource.username", mySQLContainer::getUsername);
+		registry.add("spring.datasource.password", mySQLContainer::getPassword);
+	}
 
 	@Autowired
 	private TestRestTemplate restTemplate;
