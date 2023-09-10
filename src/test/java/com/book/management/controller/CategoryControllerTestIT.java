@@ -1,23 +1,30 @@
 package com.book.management.controller;
 
-import static org.junit.Assert.assertEquals;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import com.book.management.entity.Category;
 import com.book.management.model.CategoryDTO;
+import com.book.management.service.CategoryService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
 @Testcontainers
 class CategoryControllerTestIT {
 	@Container
@@ -37,42 +44,37 @@ class CategoryControllerTestIT {
 	}
 
 	@Autowired
-	private TestRestTemplate restTemplate;
+	private MockMvc mockMvc;
+	@Autowired
+	private CategoryService categoryService;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@Test
-	void saveCategory_ShouldReturnSavedCategory() {
+	void saveCategory_ShouldReturnSavedCategory() throws Exception {
 		// Arrange
 		CategoryDTO categoryDTO = new CategoryDTO();
 		categoryDTO.setName("Test Category");
 
-		String url = "http://localhost:" + port + "/categories";
-
-		// Act
-		ResponseEntity<CategoryDTO> response = restTemplate.postForEntity(url, categoryDTO, CategoryDTO.class);
-
-		// Assert
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		CategoryDTO savedCategoryDTO = response.getBody();
-		assertEquals(categoryDTO.getName(), savedCategoryDTO.getName());
+		// Act & Assert
+		mockMvc.perform(MockMvcRequestBuilders.post("/categories").contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(categoryDTO))).andExpect(status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.name").value(categoryDTO.getName()));
 	}
 
 	@Test
-	void getCategoryById_ExistingCategoryId_ShouldReturnCategory() {
+	void getCategoryById_ExistingCategoryId_ShouldReturnCategory() throws Exception {
 		// Arrange
-		CategoryDTO expectedCategoryDTO = new CategoryDTO();
-		expectedCategoryDTO.setId(1L);
-		expectedCategoryDTO.setName("Test Category");
+		Category category = new Category();
+		category.setName("Test Category");
+		category = categoryService.save(category);
+		Long categoryId = category.getId();
 
-		String url = "http://localhost:" + port + "/categories/1";
-
-		// Act
-		ResponseEntity<CategoryDTO> response = restTemplate.getForEntity(url, CategoryDTO.class);
-
-		// Assert
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		CategoryDTO categoryDTO = response.getBody();
-		assertEquals(expectedCategoryDTO.getId(), categoryDTO.getId());
-		assertEquals(expectedCategoryDTO.getName(), categoryDTO.getName());
+		// Act & Assert
+		mockMvc.perform(
+				MockMvcRequestBuilders.get("/categories/{id}", categoryId).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andExpect(jsonPath("$.id").value(categoryId))
+				.andExpect(jsonPath("$.name").value(category.getName()));
 	}
-
 }
