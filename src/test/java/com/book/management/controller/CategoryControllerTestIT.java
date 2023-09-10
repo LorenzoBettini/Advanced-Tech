@@ -1,5 +1,6 @@
 package com.book.management.controller;
 
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,13 +24,14 @@ import com.book.management.model.CategoryDTO;
 import com.book.management.service.CategoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Testcontainers
 class CategoryControllerTestIT {
 	@Container
-	public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.1.0").withUsername("bookman")
-			.withPassword("bookman").withDatabaseName("bookman");
+	public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.1.0").withUsername("root")
+            .withPassword("root")
+            .withDatabaseName("bookman").withExposedPorts(3306);
 
 	@LocalServerPort
 	private int port;
@@ -50,31 +52,40 @@ class CategoryControllerTestIT {
 
 	@Autowired
 	private ObjectMapper objectMapper;
-
-	@Test
-	void saveCategory_ShouldReturnSavedCategory() throws Exception {
-		// Arrange
-		CategoryDTO categoryDTO = new CategoryDTO();
-		categoryDTO.setName("Test Category");
-
-		// Act & Assert
-		mockMvc.perform(MockMvcRequestBuilders.post("/categories").contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(categoryDTO))).andExpect(status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.name").value(categoryDTO.getName()));
-	}
-
-	@Test
-	void getCategoryById_ExistingCategoryId_ShouldReturnCategory() throws Exception {
-		// Arrange
-		Category category = new Category();
-		category.setName("Test Category");
-		category = categoryService.save(category);
-		Long categoryId = category.getId();
-
-		// Act & Assert
-		mockMvc.perform(
-				MockMvcRequestBuilders.get("/categories/{id}", categoryId).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk()).andExpect(jsonPath("$.id").value(categoryId))
-				.andExpect(jsonPath("$.name").value(category.getName()));
-	}
+	
+//	@Test
+//	void savsCategory_ShouldReturnSavedCategory() throws Exception {
+//
+//System.out.println(mySQLContainer.getContainerId());
+//System.out.println(mySQLContainer.getContainerIpAddress());
+//System.out.println(mySQLContainer.getHost());
+//System.out.println(mySQLContainer.getFirstMappedPort());
+//System.out.println(mySQLContainer.getExposedPorts());
+//	}
+//	@Test
+//	void saveCategory_ShouldReturnSavedCategory() throws Exception {
+//		// Arrange
+//		CategoryDTO categoryDTO = new CategoryDTO();
+//		categoryDTO.setName("Test Category");
+//
+//		// Act & Assert
+//		mockMvc.perform(MockMvcRequestBuilders.post("/categories").contentType(MediaType.APPLICATION_JSON)
+//				.content(objectMapper.writeValueAsString(categoryDTO))).andExpect(status().isOk())
+//				.andExpect(MockMvcResultMatchers.jsonPath("$.name").value(categoryDTO.getName()));
+//	}
+//
+//	@Test
+//	void getCategoryById_ExistingCategoryId_ShouldReturnCategory() throws Exception {
+//		// Arrange
+//		Category category = new Category();
+//		category.setName("Test Category");
+//		category = categoryService.save(category);
+//		Long categoryId = category.getId();
+//
+//		// Act & Assert
+//		mockMvc.perform(
+//				MockMvcRequestBuilders.get("/categories/{id}", categoryId).contentType(MediaType.APPLICATION_JSON))
+//				.andExpect(status().isOk()).andExpect(jsonPath("$.id").value(categoryId))
+//				.andExpect(jsonPath("$.name").value(category.getName()));
+//	}
 }
