@@ -1,49 +1,54 @@
-//package com.book.management.controller;
-//
-//import static org.junit.Assert.assertTrue;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-//
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.boot.web.server.LocalServerPort;
-//import org.springframework.http.MediaType;
-//import org.springframework.test.context.DynamicPropertyRegistry;
-//import org.springframework.test.context.DynamicPropertySource;
-//import org.springframework.test.web.servlet.MockMvc;
-//import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-//import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-//import org.testcontainers.containers.MySQLContainer;
-//import org.testcontainers.junit.jupiter.Container;
-//import org.testcontainers.junit.jupiter.Testcontainers;
-//
-//import com.book.management.entity.Category;
-//import com.book.management.model.CategoryDTO;
-//import com.book.management.service.CategoryService;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@AutoConfigureMockMvc
-//@Testcontainers
-//class CategoryControllerTestIT {
-//	@Container
-//	public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.1.0").withUsername("root")
-//            .withPassword("root")
-//            .withDatabaseName("bookman").withExposedPorts(3306);
-//
-//	@LocalServerPort
-//	private int port;
-//
-//	@DynamicPropertySource
-//	static void databaseProperties(DynamicPropertyRegistry registry) {
-//		registry.add("spring.jpa.hibernate.ddl-auto", () -> "update");
-//		registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.MySQL8Dialect");
-//		registry.add("spring.datasource.url", mySQLContainer::getJdbcUrl);
-//		registry.add("spring.datasource.username", mySQLContainer::getUsername);
-//		registry.add("spring.datasource.password", mySQLContainer::getPassword);
-//	}
+package com.book.management.controller;
+
+import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+import com.book.management.entity.Category;
+import com.book.management.model.CategoryDTO;
+import com.book.management.service.CategoryService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
+@Testcontainers
+class CategoryControllerTestIT {
+	@Container
+	public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.1.0").withUsername("root")
+            .withPassword("root")
+            .withDatabaseName("bookman").withExposedPorts(3306);
+
+	@LocalServerPort
+	private int port;
+
+	@DynamicPropertySource
+	static void databaseProperties(DynamicPropertyRegistry registry) {
+		registry.add("spring.jpa.hibernate.ddl-auto", () -> "update");
+		registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.MySQL8Dialect");
+		registry.add("spring.datasource.url", mySQLContainer::getJdbcUrl);
+		registry.add("spring.datasource.username", mySQLContainer::getUsername);
+		registry.add("spring.datasource.password", mySQLContainer::getPassword);
+	}
+	@Test
+	void test() {
+		assertTrue(mySQLContainer.isRunning());
+	}
+	
 //
 //	@Autowired
 //	private MockMvc mockMvc;
@@ -88,4 +93,4 @@
 //				.andExpect(status().isOk()).andExpect(jsonPath("$.id").value(categoryId))
 //				.andExpect(jsonPath("$.name").value(category.getName()));
 //	}
-//}
+}
