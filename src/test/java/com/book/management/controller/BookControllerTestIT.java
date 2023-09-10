@@ -18,7 +18,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import com.book.management.model.BookDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Testcontainers
 class BookControllerTestIT {
