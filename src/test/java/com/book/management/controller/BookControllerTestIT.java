@@ -18,14 +18,14 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import com.book.management.model.BookDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @AutoConfigureMockMvc
 @Testcontainers
 class BookControllerTestIT {
 
 	@Container
-	public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.1.0").withUsername("FahadNadeem")
-			.withPassword("Book123").withDatabaseName("bookmanagement");
+	public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.1.0").withUsername("bookman")
+			.withPassword("bookman").withDatabaseName("bookman");
 
 	@LocalServerPort
 	private int port;

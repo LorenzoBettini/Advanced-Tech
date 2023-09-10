@@ -23,13 +23,13 @@ import com.book.management.model.CategoryDTO;
 import com.book.management.service.CategoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @AutoConfigureMockMvc
 @Testcontainers
 class CategoryControllerTestIT {
 	@Container
-	public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.1.0").withUsername("FahadNadeem")
-			.withPassword("Book123").withDatabaseName("bookmanagement");
+	public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.1.0").withUsername("bookman")
+			.withPassword("bookman").withDatabaseName("bookman");
 
 	@LocalServerPort
 	private int port;
