@@ -1,31 +1,31 @@
 package com.book.management.controller;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.book.management.model.BookDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
 @Testcontainers
 class BookControllerTestIT {
 
 	@Container
-	public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.1.0").withUsername("FahadNadeem")
-			.withPassword("Book123").withDatabaseName("bookmanagement");
+	public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.1.0").withUsername("bookman")
+			.withPassword("bookman").withDatabaseName("bookman");
 
 	@LocalServerPort
 	private int port;
@@ -40,49 +40,52 @@ class BookControllerTestIT {
 	}
 
 	@Autowired
-	private TestRestTemplate restTemplate;
+	private MockMvc mockMvc;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@Test
-	void saveBook_ShouldReturnSavedBook() {
-		// Arrange
-		BookDTO bookDTO = new BookDTO();
-		bookDTO.setName("Test Book");
-		bookDTO.setAuthor("Fahad");
-		bookDTO.setPrice(19);
+    void saveBook_ShouldReturnSavedBook() throws Exception {
+        // Arrange
+        BookDTO bookDTO = new BookDTO();
+        bookDTO.setName("Test Book");
+        bookDTO.setAuthor("Fahad");
+        bookDTO.setPrice(19);
 
-		String url = "http://localhost:" + port + "/books";
+        // Act & Assert
+        mockMvc.perform(MockMvcRequestBuilders.post("/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(bookDTO)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Test Book"));
+    }
 
-		// Act
-		ResponseEntity<BookDTO> response = restTemplate.postForEntity(url, bookDTO, BookDTO.class);
+    @Test
+    void updateBook_ExistingBookId_ShouldReturnUpdatedBook() throws Exception {
+        // Arrange
+        BookDTO bookDTO = new BookDTO();
+        bookDTO.setName("Updated Book");
+        bookDTO.setAuthor("Fahad");
+        bookDTO.setPrice(2999);
 
-		// Assert
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		BookDTO savedBookDTO = response.getBody();
-		assertEquals(bookDTO.getName(), savedBookDTO.getName());
-		assertEquals(bookDTO.getAuthor(), savedBookDTO.getAuthor());
-		assertEquals(bookDTO.getPrice(), savedBookDTO.getPrice());
-	}
+        // Create a new book and get its ID
+        mockMvc.perform(MockMvcRequestBuilders.post("/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(bookDTO)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Updated Book"))
+                .andDo(result -> {
+                    String content = result.getResponse().getContentAsString();
+                    BookDTO savedBook = objectMapper.readValue(content, BookDTO.class);
+                    bookDTO.setId(savedBook.getId());
+                });
 
-	@Test
-	void updateBook_ExistingBookId_ShouldReturnUpdatedBook() {
-		// Arrange
-		BookDTO bookDTO = new BookDTO();
-		bookDTO.setName("Updated Book");
-		bookDTO.setAuthor("Fahad");
-		bookDTO.setPrice(2999);
-
-		String url = "http://localhost:" + port + "/books/1";
-
-		// Act
-		HttpEntity<BookDTO> requestEntity = new HttpEntity<>(bookDTO);
-		ResponseEntity<BookDTO> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, BookDTO.class);
-
-		// Assert
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		BookDTO updatedBookDTO = response.getBody();
-		assertEquals(bookDTO.getName(), updatedBookDTO.getName());
-		assertEquals(bookDTO.getAuthor(), updatedBookDTO.getAuthor());
-		assertEquals(bookDTO.getPrice(), updatedBookDTO.getPrice());
-	}
-
+        // Act & Assert
+        mockMvc.perform(MockMvcRequestBuilders.put("/books/{id}", bookDTO.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(bookDTO)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Updated Book"));
+    }
 }
