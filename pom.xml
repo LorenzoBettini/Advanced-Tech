@@ -202,6 +202,9 @@
 				<groupId>org.pitest</groupId>
 				<artifactId>pitest-maven</artifactId>
 				<version>1.4.9</version>
+			
+					
+			
 				<executions>
 					<execution>
 						<id>pit-report</id>
@@ -246,6 +249,7 @@
 						<outputFormat>XML</outputFormat>
 						<outputFormat>HTML</outputFormat>
 					</outputFormats>
+					<timeoutFactor>2.0</timeoutFactor> 
 				</configuration>
 			</plugin>
 		</plugins>
