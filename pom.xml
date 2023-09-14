@@ -233,7 +233,7 @@
 						<param>com.book.management.mapper.*</param>
 						<param>com.book.management.controller.*</param>
 						<param>com.book.management.controller.CategoryControllerTestIT</param>
-					<!-- 	<param>com.book.management.controller.BookControllerTestIT</param>  -->
+					<param>com.book.management.controller.BookControllerTestIT</param>
 					</targetTests>
 					<avoidCallsTo>
 						<avoidCallsTo>java.util.logging</avoidCallsTo>
