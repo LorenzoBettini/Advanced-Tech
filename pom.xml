@@ -148,6 +148,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+				<dependencies>
+                <dependency>
+                    <groupId>org.junit.platform</groupId>
+                    <artifactId>junit-platform-surefire-provider</artifactId>
+                </dependency>
+            </dependencies>
 			</plugin>
 			<!-- Coveralls -->
 			<plugin>
@@ -232,8 +238,8 @@
 					<targetTests>
 						<param>com.book.management.mapper.*</param>
 						<param>com.book.management.controller.*</param>
-						<param>com.contact.contact.integration.CategoryControllerTestIT</param>
-						<param>com.contact.contact.integration.BookControllerTestIT</param>
+						<param>com.book.management.controller.CategoryControllerTestIT</param>
+					<param>com.book.management.controller.BookControllerTestIT</param>
 					</targetTests>
 					<avoidCallsTo>
 						<avoidCallsTo>java.util.logging</avoidCallsTo>
