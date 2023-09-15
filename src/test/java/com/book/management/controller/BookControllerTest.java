@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -215,6 +216,57 @@ class BookControllerTest {
 	}
 
 	@Test
+	public void testUpdateBookWithNonNullCategoryDTO() {
+
+		CategoryDTO categoryDTO = new CategoryDTO();
+		BookDTO bookDTO = new BookDTO();
+		bookDTO.setCategory(categoryDTO);
+
+		// Create a mock Book and BookService
+		Book existingBook = new Book();
+		when(bookService.findById(anyInt())).thenReturn(existingBook);
+		when(bookService.save(existingBook)).thenReturn(existingBook);
+
+		ResponseEntity<BookDTO> responseEntity = bookController.updateBook(1, bookDTO);
+
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		assertNotNull(responseEntity.getBody());
+
+	}
+
+	@Test
+	public void testUpdateBookWithNullCategoryDTO() {
+		// Create a BookDTO with a null CategoryDTO
+		BookDTO bookDTO = new BookDTO();
+
+		Book existingBook = new Book();
+		when(bookService.findById(anyInt())).thenReturn(existingBook);
+		when(bookService.save(existingBook)).thenReturn(existingBook);
+
+		ResponseEntity<BookDTO> responseEntity = bookController.updateBook(1, bookDTO);
+
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		assertNotNull(responseEntity.getBody());
+
+	}
+
+	@Test
+	public void testUpdateBookWithNonExistingBook() {
+
+		CategoryDTO categoryDTO = new CategoryDTO();
+		BookDTO bookDTO = new BookDTO();
+		bookDTO.setCategory(categoryDTO);
+
+		// Mock the BookService to return null for findById, simulating a non-existing
+		// book
+		when(bookService.findById(anyInt())).thenReturn(null);
+
+		ResponseEntity<BookDTO> responseEntity = bookController.updateBook(1, bookDTO);
+
+		assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+	}
+
+	@Test
 	void updateBook_WithNonNullCategoryDTO_ShouldSetCategory() {
 		// Arrange
 		Integer bookId = 1;
@@ -231,14 +283,11 @@ class BookControllerTest {
 		Book existingBook = new Book();
 		existingBook.setId(bookId);
 
-		// Mocking dependencies and setting up behavior
 		when(bookService.findById(bookId)).thenReturn(existingBook);
 		when(bookService.save(existingBook)).thenReturn(existingBook);
 
-		// Act
 		ResponseEntity<BookDTO> response = bookController.updateBook(bookId, bookDTO);
 
-		// Assert
 		verify(bookService).findById(bookId);
 		verify(bookService).save(existingBook);
 
